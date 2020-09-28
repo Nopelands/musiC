@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
-project(musiC)
+project(musiC++)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(musiC main.cpp)
+add_executable(musiC++ main.cpp)
