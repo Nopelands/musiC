@@ -1,2 +1,2 @@
-# musiC
+# musiC++
 EE1 InfraSW
