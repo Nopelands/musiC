@@ -10,6 +10,7 @@
 using namespace std;
 
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_barrier_t barrier;
 string key;
 
 class Song {
@@ -60,6 +61,8 @@ void *keyboard(void *arg) {
         pthread_mutex_unlock(&mutex);
         if (key == "q") {
             pthread_exit(nullptr);
+        } else {
+            pthread_barrier_wait(&barrier);
         }
     }
 }
@@ -68,6 +71,7 @@ int main() {
     bool exit = false;
     pthread_t ler_teclado;
     pthread_create(&ler_teclado, nullptr, &keyboard, nullptr);
+    pthread_barrier_init(&barrier, nullptr, 2);
     list<Song> songs;
     std::cout << "Welcome to musiC++!" << std::endl;
     std::cout << "type q to quit" << std::endl;
@@ -81,6 +85,9 @@ int main() {
         while (pthread_mutex_trylock(&mutex));
         if (key == "q") {
             exit = true;
+        } else if (key == "a") {
+            std::cout << "stuff being done" << std::endl;
+            pthread_barrier_wait(&barrier);
         }
         key = "nope";
         pthread_mutex_unlock(&mutex);
