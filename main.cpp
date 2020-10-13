@@ -13,10 +13,10 @@ pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_barrier_t barrier;
 string key;
 
-class Song { // TODO comment
+class Song {
     string name;
-    int duration; // in seconds
-    int playback_time; // -1 means the song is not playing
+    int duration; // em segundos
+    int playback_time; // -1 significa que a música não está tocando
 public:
     Song() {
         name = "";
@@ -55,7 +55,7 @@ public:
         return formated_minutes + ":" + formated_seconds;
     }
 
-    void set_playback_time(int seconds) {
+    void set_playback_time(int seconds) { // será usado em versões futuras
         playback_time = seconds;
     }
 
@@ -64,37 +64,46 @@ public:
     }
 };
 
-void *keyboard(void *arg) { // TODO comment
+void *keyboard(void *arg) { // Thread que lê o teclado no menu principal
     string input;
     while (true) {
         std::cin >> input;
-        cin.ignore(numeric_limits<streamsize>::max(),'\n');
-        while (pthread_mutex_trylock(&mutex));
-        key = input;
+        cin.ignore(numeric_limits<streamsize>::max(),'\n'); // remove newlines presentes na stream
+        while (pthread_mutex_trylock(&mutex)); // mutex para acessar a região crítica
+        key = input; // escreve o input na variável global key
         pthread_mutex_unlock(&mutex);
         if (input == "q") {
             pthread_exit(nullptr);
         } else if (input == "a" or input == "r"){
-            pthread_barrier_wait(&barrier);
+            pthread_barrier_wait(&barrier); // impede que o thread use o teclado enquanto o main thread está processando adição ou remoção de músicas
         }
     }
 }
 
 int main() { // TODO comment
     bool exit = false;
+    bool screen_needs_refresh = true;
+    vector<Song> songs; // vetor fila de reprodução
+
+    // cria e inicia o thread do teclado
     pthread_t ler_teclado;
     pthread_create(&ler_teclado, nullptr, &keyboard, nullptr);
+
+    // inicia a barreira do teclado
     pthread_barrier_init(&barrier, nullptr, 2);
-    vector<Song> songs;
-    bool screen_needs_refresh = true;
+
+    // splash screen
     std::cout << "Welcome to musiC++!" << std::endl;
     sleep(5);
 //    system("clear");  // uncomment when running in terminal
+
+    // main loop
     while (!exit) {
+        // imprime o menu principal se necessário
         if (songs.empty() and screen_needs_refresh) {
             std::cout << R"(Your queue is empty, type "a" to add a song or "q" to quit)" << std::endl;
             screen_needs_refresh = false;
-        } else if (screen_needs_refresh) {
+        } else if (screen_needs_refresh) { // imprime o "player" de música
             screen_needs_refresh = false;
             std::cout << "Now Playing:" << std::endl;
             std::cout << songs.front().get_name() << std::endl;
@@ -107,8 +116,9 @@ int main() { // TODO comment
             }
             std::cout << R"(Type "q" to quit, "a" to add a song, and "r" to remove a song)" << std::endl;
         }
-        sleep(2);
-        while (pthread_mutex_trylock(&mutex));
+//        sleep(2);  // experimental
+
+        while (pthread_mutex_trylock(&mutex)); // adquire a tranca para acessar e modificar key
         if (key == "q") {
             exit = true;
         } else if (key == "a") {
@@ -116,46 +126,49 @@ int main() { // TODO comment
             string song_name;
             string song_duration;
 //            system("clear");  // uncomment when running in terminal
+
             std::cout << "Type the name of the song" << std::endl;
             getline(cin, song_name);
 //            system("clear");  // uncomment when running in terminal
+
             std::cout << "Type the duration of the song (in seconds)" << std::endl;
             std::cin >> song_duration;
-//            system("clear");  // uncomment when running in terminal
             cin.ignore(numeric_limits<streamsize>::max(),'\n');
-            if (song_duration.find_first_not_of( "0123456789" ) == std::string::npos) {
+//            system("clear");  // uncomment when running in terminal
+
+            if (song_duration.find_first_not_of( "0123456789" ) == std::string::npos) { // verifica se a duração é um inteiro positivo
                 stringstream stream_song_duration(song_duration);
                 int int_song_duration;
                 stream_song_duration >> int_song_duration;
-                songs.push_back(Song(song_name, int_song_duration));
+                songs.push_back(Song(song_name, int_song_duration)); // cria a música e a coloca no vetor songs
             } else {
-                std::cout << "Input is not a number" << std::endl;
+                std::cout << "Input is not a number" << std::endl; // cancela a adição e retorna ao menu
                 sleep(2);
 //                system("clear");  // uncomment when running in terminal
             }
-            pthread_barrier_wait(&barrier);
+            pthread_barrier_wait(&barrier); // libera a barreira do thread do teclado
         } else if (key == "r") {
             screen_needs_refresh = true;
 //            system("clear");  // uncomment when running in terminal
             std::cout << "Type the number of the song you wish to remove:" << std::endl;
-            for (int i = 0; i < songs.size(); ++i) {
+            for (int i = 0; i < songs.size(); ++i) { // printa a fila de reprodução para escolha do index
                 std::cout << to_string(i+1) + " " + songs[i].get_name() << std::endl;
             }
             int to_remove;
             std::cin >> to_remove;
             cin.ignore(numeric_limits<streamsize>::max(),'\n');
             to_remove = to_remove - 1;
-            if (to_remove < 0 or to_remove >= songs.size()) {
+            if (to_remove < 0 or to_remove >= songs.size()) { // verifica se a música a ser removida existe
                 std::cout << "Song not found" << std::endl;
                 sleep(2);
             } else {
                 songs.erase(songs.begin() + to_remove);
             }
 //            system("clear"); // uncomment when running in terminal
-            pthread_barrier_wait(&barrier);
+            pthread_barrier_wait(&barrier); // libera a barreira da thread do teclado
         }
-        key = "nope";
-        pthread_mutex_unlock(&mutex);
+        key = "nope"; // reseta key
+        pthread_mutex_unlock(&mutex); // sai da região crítica
     }
     return 0;
 }
