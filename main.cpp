@@ -17,6 +17,11 @@ class Song {
     int duration; // in seconds
     int playback_time; // -1 means the song is not playing
 public:
+    Song() {
+        name = "";
+        duration = 0;
+        playback_time = -1;
+    }
     Song(string song_name, int seconds) {
         name = std::move(song_name);
         duration = seconds;
