@@ -5,6 +5,8 @@
 #include <utility>
 #include <unistd.h>
 #include <cstdlib>
+#include <list>
+#include <iterator>
 using namespace std;
 
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
