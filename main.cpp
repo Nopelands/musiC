@@ -5,6 +5,7 @@
 #include <utility>
 #include <unistd.h>
 #include <cstdlib>
+#include <vector>
 #include <list>
 #include <iterator>
 #include <limits>
@@ -75,7 +76,7 @@ int main() { // TODO comment and add removal feature
     pthread_t ler_teclado;
     pthread_create(&ler_teclado, nullptr, &keyboard, nullptr);
     pthread_barrier_init(&barrier, nullptr, 2);
-    list<Song> songs;
+    vector<Song> songs;
     std::cout << "Welcome to musiC++!" << std::endl;
     sleep(5);
 //    system("clear");  // uncomment when running in terminal
@@ -88,10 +89,13 @@ int main() { // TODO comment and add removal feature
             std::cout << "0:00 [----------] " + songs.front().get_formated_duration() << std::endl;
             if (songs.size() > 1) {
                 std::cout << "Playing Next:" << std::endl;
-                auto it = std::begin(songs);
-                ++it;
-                for (auto end=std::end(songs); it!=end; ++it) {
-                    std::cout << it->get_name() + " " + it->get_formated_duration() << std::endl;
+//                auto it = std::begin(songs);
+//                ++it;
+//                for (auto end=std::end(songs); it!=end; ++it) {
+//                    std::cout << it->get_name() + " " + it->get_formated_duration() << std::endl;
+//                }
+                for (int i = 1; i < songs.size(); ++i) {
+                    std::cout << songs[i].get_name() + " " + songs[i].get_formated_duration() << std::endl;
                 }
             }
             std::cout << R"(Type "q" to quit, "a" to add a song, and "r" to remove a song)" << std::endl;
@@ -103,12 +107,36 @@ int main() { // TODO comment and add removal feature
         } else if (key == "a") {
             string song_name;
             int song_duration;
+//            system("clear");  // uncomment when running in terminal
             std::cout << "Type the name of the song" << std::endl;
             getline(cin, song_name);
+//            system("clear");  // uncomment when running in terminal
             std::cout << "Type the duration of the song (in seconds)" << std::endl;
             std::cin >> song_duration;
             cin.ignore(numeric_limits<streamsize>::max(),'\n');
             songs.push_back(Song(song_name, song_duration));
+            pthread_barrier_wait(&barrier);
+        } else if (key == "r") {
+//            system("clear");  // uncomment when running in terminal
+            std::cout << "Type the number of the song you wish to remove:" << std::endl;
+            for (int i = 0; i < songs.size(); ++i) {
+                std::cout << to_string(i+1) + " " + songs[i].get_name() << std::endl;
+            }
+//            int i = 1;
+//            for (std::list<Song>::iterator it = songs.begin(); it != songs.end(); ++it){
+//                std::cout << to_string(i) + " " + it->get_name() << std::endl;
+//            }
+            int to_remove;
+            std::cin >> to_remove;
+            cin.ignore(numeric_limits<streamsize>::max(),'\n');
+            to_remove = to_remove - 1;
+            if (to_remove < 0 or to_remove >= songs.size()) {
+                std::cout << "Song not found" << std::endl;
+                sleep(2);
+//                system("clear"); // uncomment when running in terminal
+            } else {
+                songs.erase(songs.begin() + to_remove);
+            }
             pthread_barrier_wait(&barrier);
         }
         key = "nope";
