@@ -63,6 +63,8 @@ int main() {
     pthread_create(&ler_teclado, nullptr, &keyboard, nullptr);
     std::cout << "Welcome to musiC++!" << std::endl;
     std::cout << "type q to quit" << std::endl;
+    sleep(5);
+//    system("clear");  // uncomment when running in terminal
     while (!exit) {
         std::cout << "____________________" << std::endl;
         std::cout << "This is a menu loop!" << std::endl;
