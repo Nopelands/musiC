@@ -71,11 +71,10 @@ void *keyboard(void *arg) { // TODO comment
         cin.ignore(numeric_limits<streamsize>::max(),'\n');
         while (pthread_mutex_trylock(&mutex));
         key = input;
-        bool quit_signal = input == "q";
         pthread_mutex_unlock(&mutex);
-        if (quit_signal) {
+        if (input == "q") {
             pthread_exit(nullptr);
-        } else {
+        } else if (input == "a" or input == "r"){
             pthread_barrier_wait(&barrier);
         }
     }
@@ -126,6 +125,8 @@ int main() { // TODO comment and add removal feature
                 songs.push_back(Song(song_name, int_song_duration));
             } else {
                 std::cout << "Input is not a number" << std::endl;
+                sleep(2);
+//                system("clear");  // uncomment when running in terminal
             }
             pthread_barrier_wait(&barrier);
         } else if (key == "r") {
