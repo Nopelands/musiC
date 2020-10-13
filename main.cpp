@@ -71,12 +71,5 @@ int main() {
             exit = true;
         }
     }
-//    string a;
-//    getline(cin, a);
-//    int b;
-//    std::cin >> b;
-//    Song song(a, b);
-//    std::cout << song.get_playback_time() << std::endl;
-//    std::cout << song.get_formated_duration() << std::endl;
     return 0;
 }
