@@ -4,10 +4,7 @@
 #include <string>
 #include <utility>
 #include <unistd.h>
-#include <cstdlib>
 #include <vector>
-#include <list>
-#include <iterator>
 #include <limits>
 #include <sstream>
 using namespace std;
@@ -43,7 +40,19 @@ public:
     string get_formated_duration() {
         int minutes = duration / 60;
         int seconds = duration % 60;
-        return to_string(minutes) + ":" + to_string(seconds);
+        string formated_minutes;
+        string formated_seconds;
+        if (minutes < 10) {
+            formated_minutes = "0" + to_string(minutes);
+        } else {
+            formated_minutes = to_string(minutes);
+        }
+        if (seconds < 10) {
+            formated_seconds = "0" + to_string(seconds);
+        } else {
+            formated_seconds = to_string(seconds);
+        }
+        return formated_minutes + ":" + formated_seconds;
     }
 
     void set_playback_time(int seconds) {
