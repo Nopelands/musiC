@@ -3,7 +3,11 @@
 #include <ncurses.h>
 #include <string>
 #include <utility>
+#include <unistd.h>
 using namespace std;
+
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+string key;
 
 class Song {
     string name;
@@ -37,16 +41,32 @@ public:
     int get_playback_time() {
         return playback_time;
     }
-
 };
+
+void *keyboard(void *arg) {
+    string input;
+    while (true) {
+        std::cin >> input;
+        while (pthread_mutex_trylock(&mutex));
+        key = input;
+        pthread_mutex_unlock(&mutex);
+        if (key == "q") {
+            pthread_exit(nullptr);
+        }
+    }
+}
 
 int main() {
     bool exit = false;
-    string key;
+    pthread_t ler_teclado;
+    pthread_create(&ler_teclado, nullptr, &keyboard, nullptr);
+    std::cout << "Welcome to musiC++!" << std::endl;
+    std::cout << "type q to quit" << std::endl;
     while (!exit) {
-        std::cout << "Welcome to musiC++!" << std::endl;
-        std::cout << "type q to quit" << std::endl;
-        std::cin >> key;
+        std::cout << "____________________" << std::endl;
+        std::cout << "This is a menu loop!" << std::endl;
+        std::cout << "____________________" << std::endl;
+        sleep(2);
         if (key == "q") {
             exit = true;
         }
