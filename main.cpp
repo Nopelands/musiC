@@ -68,14 +68,15 @@ int main() {
     bool exit = false;
     pthread_t ler_teclado;
     pthread_create(&ler_teclado, nullptr, &keyboard, nullptr);
+    list<Song> songs;
     std::cout << "Welcome to musiC++!" << std::endl;
     std::cout << "type q to quit" << std::endl;
     sleep(5);
 //    system("clear");  // uncomment when running in terminal
     while (!exit) {
-        std::cout << "____________________" << std::endl;
-        std::cout << "This is a menu loop!" << std::endl;
-        std::cout << "____________________" << std::endl;
+        if (songs.empty()) {
+            std::cout << R"(Your queue is empty, type "a" to add a song or "q" to quit)" << std::endl;
+        }
         sleep(2);
         while (pthread_mutex_trylock(&mutex));
         if (key == "q") {
