@@ -116,7 +116,6 @@ int main() { // TODO comment
             }
             std::cout << R"(Type "q" to quit, "a" to add a song, and "r" to remove a song)" << std::endl;
         }
-//        sleep(2);  // experimental
 
         while (pthread_mutex_trylock(&mutex)); // adquire a tranca para acessar e modificar key
         if (key == "q") {
