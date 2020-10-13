@@ -9,6 +9,7 @@
 #include <list>
 #include <iterator>
 #include <limits>
+#include <sstream>
 using namespace std;
 
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -89,11 +90,6 @@ int main() { // TODO comment and add removal feature
             std::cout << "0:00 [----------] " + songs.front().get_formated_duration() << std::endl;
             if (songs.size() > 1) {
                 std::cout << "Playing Next:" << std::endl;
-//                auto it = std::begin(songs);
-//                ++it;
-//                for (auto end=std::end(songs); it!=end; ++it) {
-//                    std::cout << it->get_name() + " " + it->get_formated_duration() << std::endl;
-//                }
                 for (int i = 1; i < songs.size(); ++i) {
                     std::cout << songs[i].get_name() + " " + songs[i].get_formated_duration() << std::endl;
                 }
@@ -106,7 +102,7 @@ int main() { // TODO comment and add removal feature
             exit = true;
         } else if (key == "a") {
             string song_name;
-            int song_duration;
+            string song_duration;
 //            system("clear");  // uncomment when running in terminal
             std::cout << "Type the name of the song" << std::endl;
             getline(cin, song_name);
@@ -114,7 +110,14 @@ int main() { // TODO comment and add removal feature
             std::cout << "Type the duration of the song (in seconds)" << std::endl;
             std::cin >> song_duration;
             cin.ignore(numeric_limits<streamsize>::max(),'\n');
-            songs.push_back(Song(song_name, song_duration));
+            if (song_duration.find_first_not_of( "0123456789" ) == std::string::npos) {
+                stringstream stream_song_duration(song_duration);
+                int int_song_duration;
+                stream_song_duration >> int_song_duration;
+                songs.push_back(Song(song_name, int_song_duration));
+            } else {
+                std::cout << "Input is not a number" << std::endl;
+            }
             pthread_barrier_wait(&barrier);
         } else if (key == "r") {
 //            system("clear");  // uncomment when running in terminal
@@ -122,10 +125,6 @@ int main() { // TODO comment and add removal feature
             for (int i = 0; i < songs.size(); ++i) {
                 std::cout << to_string(i+1) + " " + songs[i].get_name() << std::endl;
             }
-//            int i = 1;
-//            for (std::list<Song>::iterator it = songs.begin(); it != songs.end(); ++it){
-//                std::cout << to_string(i) + " " + it->get_name() << std::endl;
-//            }
             int to_remove;
             std::cin >> to_remove;
             cin.ignore(numeric_limits<streamsize>::max(),'\n');
