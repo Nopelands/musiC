@@ -60,8 +60,9 @@ void *keyboard(void *arg) { // TODO comment
         cin.ignore(numeric_limits<streamsize>::max(),'\n');
         while (pthread_mutex_trylock(&mutex));
         key = input;
+        bool quit_signal = input == "q";
         pthread_mutex_unlock(&mutex);
-        if (key == "q") {
+        if (quit_signal) {
             pthread_exit(nullptr);
         } else {
             pthread_barrier_wait(&barrier);
