@@ -14,7 +14,7 @@ pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_barrier_t barrier;
 string key;
 
-class Song {
+class Song { // TODO comment
     string name;
     int duration; // in seconds
     int playback_time; // -1 means the song is not playing
@@ -53,7 +53,7 @@ public:
     }
 };
 
-void *keyboard(void *arg) {
+void *keyboard(void *arg) { // TODO comment
     string input;
     while (true) {
         std::cin >> input;
@@ -69,7 +69,7 @@ void *keyboard(void *arg) {
     }
 }
 
-int main() {
+int main() { // TODO comment and add removal feature
     bool exit = false;
     pthread_t ler_teclado;
     pthread_create(&ler_teclado, nullptr, &keyboard, nullptr);
