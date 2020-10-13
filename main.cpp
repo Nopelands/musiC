@@ -80,7 +80,7 @@ void *keyboard(void *arg) { // TODO comment
     }
 }
 
-int main() { // TODO comment and add removal feature
+int main() { // TODO comment
     bool exit = false;
     pthread_t ler_teclado;
     pthread_create(&ler_teclado, nullptr, &keyboard, nullptr);
@@ -148,10 +148,10 @@ int main() { // TODO comment and add removal feature
             if (to_remove < 0 or to_remove >= songs.size()) {
                 std::cout << "Song not found" << std::endl;
                 sleep(2);
-//                system("clear"); // uncomment when running in terminal
             } else {
                 songs.erase(songs.begin() + to_remove);
             }
+//            system("clear"); // uncomment when running in terminal
             pthread_barrier_wait(&barrier);
         }
         key = "nope";
