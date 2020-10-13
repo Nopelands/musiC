@@ -67,9 +67,12 @@ int main() {
         std::cout << "This is a menu loop!" << std::endl;
         std::cout << "____________________" << std::endl;
         sleep(2);
+        while (pthread_mutex_trylock(&mutex));
         if (key == "q") {
             exit = true;
         }
+        key = "nope";
+        pthread_mutex_unlock(&mutex);
     }
     return 0;
 }
