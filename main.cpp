@@ -86,13 +86,16 @@ int main() { // TODO comment and add removal feature
     pthread_create(&ler_teclado, nullptr, &keyboard, nullptr);
     pthread_barrier_init(&barrier, nullptr, 2);
     vector<Song> songs;
+    bool screen_needs_refresh = true;
     std::cout << "Welcome to musiC++!" << std::endl;
     sleep(5);
 //    system("clear");  // uncomment when running in terminal
     while (!exit) {
-        if (songs.empty()) {
+        if (songs.empty() and screen_needs_refresh) {
             std::cout << R"(Your queue is empty, type "a" to add a song or "q" to quit)" << std::endl;
-        } else {
+            screen_needs_refresh = false;
+        } else if (screen_needs_refresh) {
+            screen_needs_refresh = false;
             std::cout << "Now Playing:" << std::endl;
             std::cout << songs.front().get_name() << std::endl;
             std::cout << "0:00 [----------] " + songs.front().get_formated_duration() << std::endl;
@@ -109,6 +112,7 @@ int main() { // TODO comment and add removal feature
         if (key == "q") {
             exit = true;
         } else if (key == "a") {
+            screen_needs_refresh = true;
             string song_name;
             string song_duration;
 //            system("clear");  // uncomment when running in terminal
@@ -117,6 +121,7 @@ int main() { // TODO comment and add removal feature
 //            system("clear");  // uncomment when running in terminal
             std::cout << "Type the duration of the song (in seconds)" << std::endl;
             std::cin >> song_duration;
+//            system("clear");  // uncomment when running in terminal
             cin.ignore(numeric_limits<streamsize>::max(),'\n');
             if (song_duration.find_first_not_of( "0123456789" ) == std::string::npos) {
                 stringstream stream_song_duration(song_duration);
@@ -130,6 +135,7 @@ int main() { // TODO comment and add removal feature
             }
             pthread_barrier_wait(&barrier);
         } else if (key == "r") {
+            screen_needs_refresh = true;
 //            system("clear");  // uncomment when running in terminal
             std::cout << "Type the number of the song you wish to remove:" << std::endl;
             for (int i = 0; i < songs.size(); ++i) {
@@ -150,7 +156,6 @@ int main() { // TODO comment and add removal feature
         }
         key = "nope";
         pthread_mutex_unlock(&mutex);
-//        system("clear");  // uncomment when running in terminal
     }
     return 0;
 }
