@@ -4,6 +4,7 @@
 #include <string>
 #include <utility>
 #include <unistd.h>
+#include <cstdlib>
 using namespace std;
 
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -73,6 +74,7 @@ int main() {
         }
         key = "nope";
         pthread_mutex_unlock(&mutex);
+//        system("clear");  // uncomment when running in terminal
     }
     return 0;
 }
