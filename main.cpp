@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <list>
 #include <iterator>
+#include <limits>
 using namespace std;
 
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -56,6 +57,7 @@ void *keyboard(void *arg) {
     string input;
     while (true) {
         std::cin >> input;
+        cin.ignore(numeric_limits<streamsize>::max(),'\n');
         while (pthread_mutex_trylock(&mutex));
         key = input;
         pthread_mutex_unlock(&mutex);
@@ -74,19 +76,38 @@ int main() {
     pthread_barrier_init(&barrier, nullptr, 2);
     list<Song> songs;
     std::cout << "Welcome to musiC++!" << std::endl;
-    std::cout << "type q to quit" << std::endl;
     sleep(5);
 //    system("clear");  // uncomment when running in terminal
     while (!exit) {
         if (songs.empty()) {
             std::cout << R"(Your queue is empty, type "a" to add a song or "q" to quit)" << std::endl;
+        } else {
+            std::cout << "Now Playing:" << std::endl;
+            std::cout << songs.front().get_name() << std::endl;
+            std::cout << "0:00 [----------] " + songs.front().get_formated_duration() << std::endl;
+            if (songs.size() > 1) {
+                std::cout << "Playing Next:" << std::endl;
+                auto it = std::begin(songs);
+                ++it;
+                for (auto end=std::end(songs); it!=end; ++it) {
+                    std::cout << it->get_name() + " " + it->get_formated_duration() << std::endl;
+                }
+            }
+            std::cout << R"(Type "q" to quit, "a" to add a song, and "r" to remove a song)" << std::endl;
         }
         sleep(2);
         while (pthread_mutex_trylock(&mutex));
         if (key == "q") {
             exit = true;
         } else if (key == "a") {
-            std::cout << "stuff being done" << std::endl;
+            string song_name;
+            int song_duration;
+            std::cout << "Type the name of the song" << std::endl;
+            getline(cin, song_name);
+            std::cout << "Type the duration of the song (in seconds)" << std::endl;
+            std::cin >> song_duration;
+            cin.ignore(numeric_limits<streamsize>::max(),'\n');
+            songs.push_back(Song(song_name, song_duration));
             pthread_barrier_wait(&barrier);
         }
         key = "nope";
