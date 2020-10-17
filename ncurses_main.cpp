@@ -74,13 +74,17 @@ int main() {
     vector<Song> biblioteca;
     biblioteca = fake_folder_init(); // initializes the fake folder the songs will come from
     // TODO implement main menu with ncurses
+        //TODO implement library window
+        // TODO implement playlist window
+            // TODO implement visual progress bar
+        // TODO implement control help window
+        // TODO implement player window
     // TODO implement keyboard reading thread
     // TODO implement quit feature
     // TODO implement playlist vector
     // TODO implement adding songs
     // TODO implement removing songs
     // TODO implement progress bar thread
-    // TODO implement visual progress bar
     // TODO implement play feature
     // TODO implement pause feature
     // TODO implement skip song feature
