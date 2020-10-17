@@ -95,7 +95,7 @@ int main() { // TODO comment
     // splash screen
     std::cout << "Welcome to musiC++!" << std::endl;
     sleep(5);
-//    system("clear");  // uncomment when running in terminal
+    system("clear");
 
     // main loop
     while (!exit) {
@@ -124,16 +124,16 @@ int main() { // TODO comment
             screen_needs_refresh = true;
             string song_name;
             string song_duration;
-//            system("clear");  // uncomment when running in terminal
+            system("clear");
 
             std::cout << "Type the name of the song" << std::endl;
             getline(cin, song_name);
-//            system("clear");  // uncomment when running in terminal
+            system("clear");
 
             std::cout << "Type the duration of the song (in seconds)" << std::endl;
             std::cin >> song_duration;
             cin.ignore(numeric_limits<streamsize>::max(),'\n');
-//            system("clear");  // uncomment when running in terminal
+            system("clear");
 
             if (song_duration.find_first_not_of( "0123456789" ) == std::string::npos) { // verifica se a duração é um inteiro positivo
                 stringstream stream_song_duration(song_duration);
@@ -143,12 +143,12 @@ int main() { // TODO comment
             } else {
                 std::cout << "Input is not a number" << std::endl; // cancela a adição e retorna ao menu
                 sleep(2);
-//                system("clear");  // uncomment when running in terminal
+                system("clear");
             }
             pthread_barrier_wait(&barrier); // libera a barreira do thread do teclado
         } else if (key == "r") {
             screen_needs_refresh = true;
-//            system("clear");  // uncomment when running in terminal
+            system("clear");
             std::cout << "Type the number of the song you wish to remove:" << std::endl;
             for (int i = 0; i < songs.size(); ++i) { // printa a fila de reprodução para escolha do index
                 std::cout << to_string(i+1) + " " + songs[i].get_name() << std::endl;
@@ -163,7 +163,7 @@ int main() { // TODO comment
             } else {
                 songs.erase(songs.begin() + to_remove);
             }
-//            system("clear"); // uncomment when running in terminal
+            system("clear");
             pthread_barrier_wait(&barrier); // libera a barreira da thread do teclado
         }
         key = "nope"; // reseta key
