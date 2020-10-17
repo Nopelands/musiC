@@ -60,12 +60,23 @@ public:
     }
 };
 
+vector<Song> fake_folder_init() { // TODO music this up
+    vector<Song> library;
+    library.push_back(Song("test1", 31));
+    library.push_back(Song("test2", 32));
+    library.push_back(Song("test3", 33));
+    library.push_back(Song("test4", 34));
+    library.push_back(Song("test5", 35));
+    return library;
+}
+
 int main() {
+    vector<Song> biblioteca;
+    biblioteca = fake_folder_init(); // initializes the fake folder the songs will come from
     // TODO implement main menu with ncurses
     // TODO implement keyboard reading thread
     // TODO implement quit feature
     // TODO implement playlist vector
-    // TODO implement fake folder for adding songs from
     // TODO implement adding songs
     // TODO implement removing songs
     // TODO implement progress bar thread
