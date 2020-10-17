@@ -76,9 +76,9 @@ int main() {
     // TODO implement main menu with ncurses
         //TODO implement library window
         // TODO implement playlist window
-            // TODO implement visual progress bar
         // TODO implement control help window
         // TODO implement player window
+            // TODO implement visual progress bar
     // TODO implement keyboard reading thread
     // TODO implement quit feature
     // TODO implement playlist vector
