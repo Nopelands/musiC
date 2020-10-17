@@ -6,3 +6,4 @@ SET(CMAKE_CXX_FLAGS -lncurses)
 set(CMAKE_CXX_STANDARD 14)
 
 add_executable(musiC++ main.cpp)
+add_executable(music++ ncurses_main.cpp)
