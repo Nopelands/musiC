@@ -62,19 +62,49 @@ public:
 
 vector<Song> fake_folder_init() { // TODO music this up
     vector<Song> library;
-    library.push_back(Song("test1", 31));
-    library.push_back(Song("test2", 32));
-    library.push_back(Song("test3", 33));
-    library.push_back(Song("test4", 34));
-    library.push_back(Song("test5", 35));
+    library.push_back(Song("test1.mp3", 31));
+    library.push_back(Song("test2.mp3", 32));
+    library.push_back(Song("test3.mp3", 33));
+    library.push_back(Song("test4.mp3", 34));
+    library.push_back(Song("test5.mp3", 35));
     return library;
 }
 
 int main() {
     vector<Song> biblioteca;
     biblioteca = fake_folder_init(); // initializes the fake folder the songs will come from
+    initscr();
+    int max_screen_size_y;
+    int max_screen_size_x;
+    getmaxyx(stdscr, max_screen_size_y, max_screen_size_x);
+
+    WINDOW *library_window = newwin(max_screen_size_y, max_screen_size_x/3, 0, 0);
+    WINDOW *playlist_window = newwin(3*(max_screen_size_y/4), 2*(max_screen_size_x/3), 0, max_screen_size_x/3);
+    WINDOW *control_help_window = newwin(1, max_screen_size_x - max_screen_size_x/3, max_screen_size_y-1, max_screen_size_x/3);
+    WINDOW *player_window = newwin((max_screen_size_y - 1) - (3*(max_screen_size_y/4)), 2*(max_screen_size_x/3), 3*(max_screen_size_y/4), max_screen_size_x/3);
+    refresh();
+
+    box(library_window, '|', '-');
+    wmove(library_window, 1, 1);
+    wprintw(library_window, "/home/user/Music");
+    for (int i = 0; i < biblioteca.size(); ++i) {
+        wmove(library_window, i + 2, 1);
+        wprintw(library_window, (to_string(i+1) + " " + biblioteca[i].get_name()).data());
+    }
+    wrefresh(library_window);
+
+    box(playlist_window, '|', '-');
+    wrefresh(playlist_window);
+
+    wprintw(control_help_window, " LOREM IPSUM DOLOR SIT AMET");
+    wrefresh(control_help_window);
+
+    box(player_window, '|', '-');
+    wrefresh(player_window);
+
+    getch();
+    endwin();
     // TODO implement main menu with ncurses
-        //TODO implement library window
         // TODO implement playlist window
         // TODO implement control help window
         // TODO implement player window
