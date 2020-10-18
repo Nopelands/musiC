@@ -73,7 +73,10 @@ vector<Song> fake_folder_init() { // TODO music this up
 int main() {
     vector<Song> biblioteca;
     biblioteca = fake_folder_init(); // initializes the fake folder the songs will come from
+    vector<Song> playlist;
+
     initscr();
+    noecho();
     int max_screen_size_y;
     int max_screen_size_x;
     getmaxyx(stdscr, max_screen_size_y, max_screen_size_x);
@@ -102,10 +105,41 @@ int main() {
     box(player_window, '|', '-');
     wrefresh(player_window);
 
+    // window variables
+
+    bool playlist_window_needs_refresh = true;
+
+    // main loop
+
+    playlist.push_back(biblioteca[0]);
+    playlist.push_back(biblioteca[2]);
+
+    while (true) {
+        if (playlist.empty() and playlist_window_needs_refresh) {
+            wclear(playlist_window);
+            box(playlist_window, '|', '-');
+            wmove(playlist_window, 1, 1);
+            wprintw(playlist_window, "Your playlist is empty, press a to add a song");
+            wrefresh(playlist_window);
+            getch();
+        } else if (playlist_window_needs_refresh) {
+            wclear(playlist_window);
+            box(playlist_window, '|', '-');
+            wmove(playlist_window, 1, 1);
+            wprintw(playlist_window, ("> " + playlist[0].get_name() + " " + playlist[0].get_formated_duration() + " <").data());
+            for (int i = 1; i < playlist.size(); ++i) {
+                wmove(playlist_window, i + 1, 3);
+                wprintw(playlist_window, (playlist[i].get_name() + " " + playlist[i].get_formated_duration()).data());
+            }
+            wrefresh(playlist_window);
+            getch();
+        }
+        break;
+    }
+
     getch();
     endwin();
     // TODO implement main menu with ncurses
-        // TODO implement playlist window
         // TODO implement control help window
         // TODO implement player window
             // TODO implement visual progress bar
