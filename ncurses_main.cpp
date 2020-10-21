@@ -77,6 +77,9 @@ int main() {
 
     initscr();
     noecho();
+    cbreak();
+//    halfdelay(1);
+    keypad(stdscr, true);
     int max_screen_size_y;
     int max_screen_size_x;
     getmaxyx(stdscr, max_screen_size_y, max_screen_size_x);
@@ -143,7 +146,6 @@ int main() {
         // TODO implement control help window
         // TODO implement player window
             // TODO implement visual progress bar
-    // TODO implement keyboard reading thread
     // TODO implement quit feature
     // TODO implement playlist vector
     // TODO implement adding songs
