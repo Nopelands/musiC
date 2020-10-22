@@ -107,9 +107,8 @@ int main() {
     box(playlist_window, 0, 0);
     wrefresh(playlist_window);
 
-    attron(COLOR_PAIR(1));
+    wbkgd(control_help_window, COLOR_PAIR(1));
     wprintw(control_help_window, " add mode enabled, press [r] to enable remove mode or [q] to quit");
-    attroff(COLOR_PAIR(1));
     wrefresh(control_help_window);
 
     box(player_window, 0, 0);
@@ -129,18 +128,14 @@ int main() {
         switch (keypress) {
             case 97:
                 playlist_add_mode = true;
-                attron(COLOR_PAIR(1));
                 wmove(control_help_window, 0, 0);
                 wprintw(control_help_window, " add mode enabled, press [r] to enable remove mode or [q] to quit");
-                attroff(COLOR_PAIR(1));
                 wrefresh(control_help_window);
                 break;
             case 114:
                 playlist_add_mode = false;
-                attron(COLOR_PAIR(1));
                 wmove(control_help_window, 0, 0);
                 wprintw(control_help_window, " remove mode enabled, press [a] to enable add mode or [q] to quit");
-                attroff(COLOR_PAIR(1));
                 wrefresh(control_help_window);
                 break;
             case ERR:
@@ -170,11 +165,8 @@ int main() {
 
     endwin();
     // TODO implement main menu with ncurses
-        // TODO implement control help window
         // TODO implement player window
             // TODO implement visual progress bar
-    // TODO implement quit feature
-    // TODO implement playlist vector
     // TODO implement adding songs
     // TODO implement removing songs
     // TODO implement progress bar thread
