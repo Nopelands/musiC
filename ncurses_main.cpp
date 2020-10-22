@@ -60,6 +60,8 @@ public:
     }
 };
 
+Song global_playing_song;
+
 vector<Song> fake_folder_init() { // TODO music this up
     vector<Song> library;
     library.push_back(Song("test1.mp3", 31));
@@ -124,6 +126,7 @@ int main() {
 
     bool playlist_window_needs_refresh = true;
     bool playlist_add_mode = true;
+    int player_window_y_center = ((max_screen_size_y - 1) - (3*(max_screen_size_y/4))) / 2;
 
     // main loop
 
@@ -181,6 +184,22 @@ int main() {
             }
             wrefresh(playlist_window);
             playlist_window_needs_refresh = false;
+        }
+
+        // player window update
+
+        if (playlist.empty()) {
+            wmove(player_window, player_window_y_center, ((2*(max_screen_size_x/3)) - 19) / 2);
+            wprintw(player_window, "Nothing is playing");
+            wrefresh(player_window);
+        } else {
+            string current_song_name = playlist[0].get_name();
+            wmove(player_window, player_window_y_center - 1, ((2*(max_screen_size_x/3)) - current_song_name.size()) / 2);
+            wprintw(player_window, current_song_name.data());
+            // "12:45 [----------] 15:00"
+            wmove(player_window, player_window_y_center, ((2 * (max_screen_size_x / 3)) - 24) / 2);
+            wprintw(player_window, ("00:00 [----------] " + playlist[0].get_formated_duration()).data());
+            wrefresh(player_window);
         }
     }
 
