@@ -74,11 +74,12 @@ int main() {
     vector<Song> biblioteca;
     biblioteca = fake_folder_init(); // initializes the fake folder the songs will come from
     vector<Song> playlist;
+    int keypress;
 
     initscr();
     noecho();
-    cbreak();
-//    halfdelay(1);
+//    cbreak();
+    halfdelay(10);
     keypad(stdscr, true);
     int max_screen_size_y;
     int max_screen_size_x;
@@ -90,7 +91,7 @@ int main() {
     WINDOW *player_window = newwin((max_screen_size_y - 1) - (3*(max_screen_size_y/4)), 2*(max_screen_size_x/3), 3*(max_screen_size_y/4), max_screen_size_x/3);
     refresh();
 
-    box(library_window, '|', '-');
+    box(library_window, 0, 0);
     wmove(library_window, 1, 1);
     wprintw(library_window, "/home/user/Music");
     for (int i = 0; i < biblioteca.size(); ++i) {
@@ -99,13 +100,13 @@ int main() {
     }
     wrefresh(library_window);
 
-    box(playlist_window, '|', '-');
+    box(playlist_window, 0, 0);
     wrefresh(playlist_window);
 
-    wprintw(control_help_window, " LOREM IPSUM DOLOR SIT AMET");
+    wprintw(control_help_window, " [a] add song [r] remove song [q] quit");
     wrefresh(control_help_window);
 
-    box(player_window, '|', '-');
+    box(player_window, 0, 0);
     wrefresh(player_window);
 
     // window variables
@@ -114,20 +115,32 @@ int main() {
 
     // main loop
 
-    playlist.push_back(biblioteca[0]);
-    playlist.push_back(biblioteca[2]);
+    playlist.push_back(biblioteca[0]); // test statement
+    playlist.push_back(biblioteca[2]); // test statement
 
-    while (true) {
+    while ((keypress = getch()) != 'q') {
+        switch (keypress) {
+            case 97:
+                wmove(playlist_window, 1 + playlist.size(), 1);
+                wprintw(playlist_window, "Press the number of the song you wish to add.");
+                wrefresh(playlist_window);
+                getch();
+                playlist_window_needs_refresh = true;
+                break;
+            case ERR:
+                break;
+        }
+        // playlist_window update
         if (playlist.empty() and playlist_window_needs_refresh) {
             wclear(playlist_window);
-            box(playlist_window, '|', '-');
+            box(playlist_window, 0, 0);
             wmove(playlist_window, 1, 1);
-            wprintw(playlist_window, "Your playlist is empty, press a to add a song");
+            wprintw(playlist_window, "Your playlist is empty.");
             wrefresh(playlist_window);
-            getch();
+            playlist_window_needs_refresh = false;
         } else if (playlist_window_needs_refresh) {
             wclear(playlist_window);
-            box(playlist_window, '|', '-');
+            box(playlist_window, 0, 0);
             wmove(playlist_window, 1, 1);
             wprintw(playlist_window, ("> " + playlist[0].get_name() + " " + playlist[0].get_formated_duration() + " <").data());
             for (int i = 1; i < playlist.size(); ++i) {
@@ -135,12 +148,10 @@ int main() {
                 wprintw(playlist_window, (playlist[i].get_name() + " " + playlist[i].get_formated_duration()).data());
             }
             wrefresh(playlist_window);
-            getch();
+            playlist_window_needs_refresh = false;
         }
-        break;
     }
 
-    getch();
     endwin();
     // TODO implement main menu with ncurses
         // TODO implement control help window
