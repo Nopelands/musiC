@@ -76,8 +76,12 @@ int main() {
     vector<Song> playlist;
     int keypress;
 
+    // ncurses setup
     initscr();
     noecho();
+    curs_set(0);
+    start_color();
+    init_pair(1, COLOR_BLACK, COLOR_WHITE);
 //    cbreak();
     halfdelay(10);
     keypad(stdscr, true);
@@ -103,7 +107,9 @@ int main() {
     box(playlist_window, 0, 0);
     wrefresh(playlist_window);
 
-    wprintw(control_help_window, " [a] add song [r] remove song [q] quit");
+    attron(COLOR_PAIR(1));
+    wprintw(control_help_window, " add mode enabled, press [r] to enable remove mode or [q] to quit");
+    attroff(COLOR_PAIR(1));
     wrefresh(control_help_window);
 
     box(player_window, 0, 0);
@@ -112,6 +118,7 @@ int main() {
     // window variables
 
     bool playlist_window_needs_refresh = true;
+    bool playlist_add_mode = true;
 
     // main loop
 
@@ -121,11 +128,20 @@ int main() {
     while ((keypress = getch()) != 'q') {
         switch (keypress) {
             case 97:
-                wmove(playlist_window, 1 + playlist.size(), 1);
-                wprintw(playlist_window, "Press the number of the song you wish to add.");
-                wrefresh(playlist_window);
-                getch();
-                playlist_window_needs_refresh = true;
+                playlist_add_mode = true;
+                attron(COLOR_PAIR(1));
+                wmove(control_help_window, 0, 0);
+                wprintw(control_help_window, " add mode enabled, press [r] to enable remove mode or [q] to quit");
+                attroff(COLOR_PAIR(1));
+                wrefresh(control_help_window);
+                break;
+            case 114:
+                playlist_add_mode = false;
+                attron(COLOR_PAIR(1));
+                wmove(control_help_window, 0, 0);
+                wprintw(control_help_window, " remove mode enabled, press [a] to enable add mode or [q] to quit");
+                attroff(COLOR_PAIR(1));
+                wrefresh(control_help_window);
                 break;
             case ERR:
                 break;
