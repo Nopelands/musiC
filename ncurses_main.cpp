@@ -67,6 +67,10 @@ vector<Song> fake_folder_init() { // TODO music this up
     library.push_back(Song("test3.mp3", 33));
     library.push_back(Song("test4.mp3", 34));
     library.push_back(Song("test5.mp3", 35));
+    library.push_back(Song("test6.mp3", 36));
+    library.push_back(Song("test7.mp3", 37));
+    library.push_back(Song("test8.mp3", 38));
+    library.push_back(Song("test9.mp3", 39));
     return library;
 }
 
@@ -105,6 +109,8 @@ int main() {
     wrefresh(library_window);
 
     box(playlist_window, 0, 0);
+    wmove(playlist_window, 1, 1);
+    wprintw(playlist_window, "Loading...");
     wrefresh(playlist_window);
 
     wbkgd(control_help_window, COLOR_PAIR(1));
@@ -121,9 +127,6 @@ int main() {
 
     // main loop
 
-    playlist.push_back(biblioteca[0]); // test statement
-    playlist.push_back(biblioteca[2]); // test statement
-
     while ((keypress = getch()) != 'q') {
         switch (keypress) {
             case 97:
@@ -137,6 +140,24 @@ int main() {
                 wmove(control_help_window, 0, 0);
                 wprintw(control_help_window, " remove mode enabled, press [a] to enable add mode or [q] to quit");
                 wrefresh(control_help_window);
+                break;
+            case 49 ... 57:
+                keypress = keypress - 49;
+                if (playlist_add_mode) {
+                    if (playlist.size() < 9) {
+                        playlist.push_back(biblioteca[keypress]);
+                        playlist_window_needs_refresh = true;
+                    } else {
+                        wmove(playlist_window, 11, 1);
+                        wprintw(playlist_window, "Playlist limit reached");
+                        wrefresh(playlist_window);
+                    }
+                } else {
+                    if (not playlist.empty() and keypress < playlist.size()) {
+                        playlist.erase(playlist.begin() + keypress);
+                        playlist_window_needs_refresh = true;
+                    }
+                }
                 break;
             case ERR:
                 break;
@@ -153,10 +174,10 @@ int main() {
             wclear(playlist_window);
             box(playlist_window, 0, 0);
             wmove(playlist_window, 1, 1);
-            wprintw(playlist_window, ("> " + playlist[0].get_name() + " " + playlist[0].get_formated_duration() + " <").data());
+            wprintw(playlist_window, ("1 > " + playlist[0].get_name() + " " + playlist[0].get_formated_duration() + " <").data());
             for (int i = 1; i < playlist.size(); ++i) {
-                wmove(playlist_window, i + 1, 3);
-                wprintw(playlist_window, (playlist[i].get_name() + " " + playlist[i].get_formated_duration()).data());
+                wmove(playlist_window, i + 1, 1);
+                wprintw(playlist_window, (to_string(i + 1) + "   " + playlist[i].get_name() + " " + playlist[i].get_formated_duration()).data());
             }
             wrefresh(playlist_window);
             playlist_window_needs_refresh = false;
@@ -167,8 +188,6 @@ int main() {
     // TODO implement main menu with ncurses
         // TODO implement player window
             // TODO implement visual progress bar
-    // TODO implement adding songs
-    // TODO implement removing songs
     // TODO implement progress bar thread
     // TODO implement play feature
     // TODO implement pause feature
