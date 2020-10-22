@@ -61,15 +61,6 @@ public:
 };
 
 Song global_playing_song;
-bool is_playing = false;
-pthread_mutex_t player_mutex = PTHREAD_MUTEX_INITIALIZER;
-
-void *player(void *arg) {
-    while (true) {
-        while (pthread_mutex_trylock(&player_mutex));
-        if () {}
-    }
-}
 
 vector<Song> fake_folder_init() { // TODO music this up
     vector<Song> library;
@@ -174,18 +165,6 @@ int main() {
             case ERR:
                 break;
         }
-
-        // player thread signal
-        if (playlist.empty()) {
-            while (pthread_mutex_trylock(&player_mutex));
-            is_playing = false;
-            pthread_mutex_unlock(&player_mutex);
-        } else {
-            while (pthread_mutex_trylock(&player_mutex));
-            is_playing = true;
-            pthread_mutex_unlock(&player_mutex);
-        }
-
         // playlist_window update
         if (playlist.empty() and playlist_window_needs_refresh) {
             wclear(playlist_window);
@@ -210,14 +189,10 @@ int main() {
         // player window update
 
         if (playlist.empty()) {
-            wclear(player_window);
-            box(player_window, 0, 0);
             wmove(player_window, player_window_y_center, ((2*(max_screen_size_x/3)) - 19) / 2);
             wprintw(player_window, "Nothing is playing");
             wrefresh(player_window);
         } else {
-            wclear(player_window);
-            box(player_window, 0, 0);
             string current_song_name = playlist[0].get_name();
             wmove(player_window, player_window_y_center - 1, ((2*(max_screen_size_x/3)) - current_song_name.size()) / 2);
             wprintw(player_window, current_song_name.data());
