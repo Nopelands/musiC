@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <limits>
 #include <sstream>
+#include <chrono>
 
 using namespace std;
 
@@ -60,7 +61,39 @@ public:
     }
 };
 
-Song global_playing_song;
+std::chrono::system_clock::rep time_since_epoch(){
+    static_assert(
+            std::is_integral<std::chrono::system_clock::rep>::value,
+            "Representation of ticks isn't an integral value."
+    );
+    auto now = std::chrono::system_clock::now().time_since_epoch();
+    return std::chrono::duration_cast<std::chrono::seconds>(now).count();
+}
+
+pthread_mutex_t player_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t reset_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t time_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+bool global_playing_song = false;
+bool player_reset = false;
+int global_player_time;
+
+void *player(void *arg) {
+    int song_start_time;
+    while (true) {
+        while (pthread_mutex_trylock(&player_mutex));
+        if (global_playing_song) {
+            if (player_reset) {
+                song_start_time = time_since_epoch();
+                global_player_time = 0;
+                player_reset = false;
+            } else {
+                global_player_time = time_since_epoch() - song_start_time;
+            }
+        }
+        pthread_mutex_unlock(&player_mutex);
+    }
+}
 
 vector<Song> fake_folder_init() { // TODO music this up
     vector<Song> library;
@@ -81,6 +114,8 @@ int main() {
     biblioteca = fake_folder_init(); // initializes the fake folder the songs will come from
     vector<Song> playlist;
     int keypress;
+    pthread_t player_thread;
+    pthread_create(&player_thread, nullptr, &player, nullptr);
 
     // ncurses setup
     initscr();
@@ -147,6 +182,12 @@ int main() {
             case 49 ... 57:
                 keypress = keypress - 49;
                 if (playlist_add_mode) {
+                    if (playlist.empty()) {
+                        while (pthread_mutex_trylock(&player_mutex));
+                        global_playing_song = true;
+                        player_reset = true;
+                        pthread_mutex_unlock(&player_mutex);
+                    }
                     if (playlist.size() < 9) {
                         playlist.push_back(biblioteca[keypress]);
                         playlist_window_needs_refresh = true;
@@ -159,6 +200,15 @@ int main() {
                     if (not playlist.empty() and keypress < playlist.size()) {
                         playlist.erase(playlist.begin() + keypress);
                         playlist_window_needs_refresh = true;
+                        if (playlist.empty()) {
+                            while (pthread_mutex_trylock(&player_mutex));
+                            global_playing_song = false;
+                            pthread_mutex_unlock(&player_mutex);
+                        } else if (keypress == 0) {
+                            while (pthread_mutex_trylock(&player_mutex));
+                            player_reset = true;
+                            pthread_mutex_unlock(&player_mutex);
+                        }
                     }
                 }
                 break;
@@ -188,6 +238,20 @@ int main() {
 
         // player window update
 
+        if (!playlist.empty()) {
+            while (pthread_mutex_trylock(&player_mutex));
+            if (global_player_time >= playlist[0].get_duration()) {
+                playlist.erase(playlist.begin());
+                playlist_window_needs_refresh = true;
+                if (playlist.empty()) {
+                    global_playing_song = false;
+                } else {
+                    player_reset = true;
+                }
+            }
+            pthread_mutex_unlock(&player_mutex);
+        }
+
         if (playlist.empty()) {
             wclear(player_window);
             box(player_window, 0, 0);
@@ -202,16 +266,41 @@ int main() {
             wprintw(player_window, current_song_name.data());
             // "12:45 [----------] 15:00"
             wmove(player_window, player_window_y_center, ((2 * (max_screen_size_x / 3)) - 24) / 2);
-            wprintw(player_window, ("00:00 [----------] " + playlist[0].get_formated_duration()).data());
+            while (pthread_mutex_trylock(&player_mutex));
+            Song why_am_I_doing_this = Song("I swear this is a temporary fix", global_player_time);
+            string formated_playback_time = why_am_I_doing_this.get_formated_duration();
+            float playback_ratio = ((float)global_player_time) / (float)playlist[0].get_duration();
+            pthread_mutex_unlock(&player_mutex);
+            string song_progress;
+            if (playback_ratio < 0.1) {
+                song_progress = "----------";
+            } else if (playback_ratio > 0.1 and playback_ratio < 0.2) {
+                song_progress = "#---------";
+            } else if (playback_ratio > 0.2 and playback_ratio < 0.3) {
+                song_progress = "##--------";
+            } else if (playback_ratio > 0.3 and playback_ratio < 0.4) {
+                song_progress = "###-------";
+            } else if (playback_ratio > 0.4 and playback_ratio < 0.5) {
+                song_progress = "####------";
+            } else if (playback_ratio > 0.5 and playback_ratio < 0.6) {
+                song_progress = "#####-----";
+            } else if (playback_ratio > 0.6 and playback_ratio < 0.7) {
+                song_progress = "######----";
+            } else if (playback_ratio > 0.7 and playback_ratio < 0.8) {
+                song_progress = "#######---";
+            } else if (playback_ratio > 0.8 and playback_ratio < 0.9) {
+                song_progress = "########--";
+            } else if (playback_ratio > 0.9 and playback_ratio < 1.0) {
+                song_progress = "#########-";
+            } else {
+                song_progress = "##########";
+            }
+            wprintw(player_window, (formated_playback_time + " [" + song_progress + "] " + playlist[0].get_formated_duration()).data());
             wrefresh(player_window);
         }
     }
 
     endwin();
-    // TODO implement main menu with ncurses
-        // TODO implement player window
-            // TODO implement visual progress bar
-    // TODO implement progress bar thread
     // TODO implement play feature
     // TODO implement pause feature
     // TODO implement skip song feature
