@@ -93,17 +93,17 @@ void *player(void *arg) {
     }
 }
 
-vector<Song> fake_folder_init() { // TODO music this up
+vector<Song> fake_folder_init() {
     vector<Song> library;
-    library.push_back(Song("test1.mp3", 31));
-    library.push_back(Song("test2.mp3", 32));
-    library.push_back(Song("test3.mp3", 33));
-    library.push_back(Song("test4.mp3", 34));
-    library.push_back(Song("test5.mp3", 35));
-    library.push_back(Song("test6.mp3", 36));
-    library.push_back(Song("test7.mp3", 37));
-    library.push_back(Song("test8.mp3", 38));
-    library.push_back(Song("test9.mp3", 39));
+    library.push_back(Song("Every Day Is Night.mp3", 221)); // Time to mix drinks and change lives
+    library.push_back(Song("Throw Away Your Mask.mp3", 242)); // A reality where... no one suffers...
+    library.push_back(Song("Gentle Madman.mp3", 184)); // I will never let a tragedy like that happen, ever again.
+    library.push_back(Song("The Hunter.mp3", 204)); // Beasts all over the shop. You'll be one of them... Sooner or later...
+    library.push_back(Song("Nameless King.mp3", 266)); // Nothing will remain once the bell has tolled
+    library.push_back(Song("The Person Who Controls Explosion Magic.mp3", 63)); // EXPLOSION
+    library.push_back(Song("Decretum.mp3", 108)); // I was stupid... So stupid...
+    library.push_back(Song("Gate of Steiner.mp3", 227)); // Shed a tear and leap to a new world
+    library.push_back(Song("Battle Against a True Hero.mp3", 156)); // The wind is howling...
     return library;
 }
 
