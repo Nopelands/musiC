@@ -308,23 +308,23 @@ int main() {
             string song_progress;
             if (playback_ratio < 0.1) {
                 song_progress = "----------";
-            } else if (playback_ratio > 0.1 and playback_ratio < 0.2) {
+            } else if (playback_ratio >= 0.1 and playback_ratio < 0.2) {
                 song_progress = "#---------";
-            } else if (playback_ratio > 0.2 and playback_ratio < 0.3) {
+            } else if (playback_ratio >= 0.2 and playback_ratio < 0.3) {
                 song_progress = "##--------";
-            } else if (playback_ratio > 0.3 and playback_ratio < 0.4) {
+            } else if (playback_ratio >= 0.3 and playback_ratio < 0.4) {
                 song_progress = "###-------";
-            } else if (playback_ratio > 0.4 and playback_ratio < 0.5) {
+            } else if (playback_ratio >= 0.4 and playback_ratio < 0.5) {
                 song_progress = "####------";
-            } else if (playback_ratio > 0.5 and playback_ratio < 0.6) {
+            } else if (playback_ratio >= 0.5 and playback_ratio < 0.6) {
                 song_progress = "#####-----";
-            } else if (playback_ratio > 0.6 and playback_ratio < 0.7) {
+            } else if (playback_ratio >= 0.6 and playback_ratio < 0.7) {
                 song_progress = "######----";
-            } else if (playback_ratio > 0.7 and playback_ratio < 0.8) {
+            } else if (playback_ratio >= 0.7 and playback_ratio < 0.8) {
                 song_progress = "#######---";
-            } else if (playback_ratio > 0.8 and playback_ratio < 0.9) {
+            } else if (playback_ratio >= 0.8 and playback_ratio < 0.9) {
                 song_progress = "########--";
-            } else if (playback_ratio > 0.9 and playback_ratio < 1.0) {
+            } else if (playback_ratio >= 0.9 and playback_ratio < 1.0) {
                 song_progress = "#########-";
             } else {
                 song_progress = "##########";
