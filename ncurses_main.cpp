@@ -76,10 +76,12 @@ pthread_mutex_t time_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 bool global_playing_song = false;
 bool player_reset = false;
+int global_epoch_when_song_was_paused = 0;
 int global_player_time;
 
 void *player(void *arg) {
-    int song_start_time;
+    int song_start_time = 0;
+    int playback_time_offset = 0;
     while (true) {
         while (pthread_mutex_trylock(&player_mutex));
         if (global_playing_song) {
@@ -87,8 +89,16 @@ void *player(void *arg) {
                 song_start_time = time_since_epoch();
                 global_player_time = 0;
                 player_reset = false;
+                playback_time_offset = 0;
             } else {
-                global_player_time = time_since_epoch() - song_start_time;
+                if (global_epoch_when_song_was_paused != 0) {
+                    song_start_time = time_since_epoch();
+                    playback_time_offset = global_player_time;
+                    global_player_time = playback_time_offset + time_since_epoch() - song_start_time;
+                    global_epoch_when_song_was_paused = 0;
+                } else {
+                    global_player_time = playback_time_offset + time_since_epoch() - song_start_time;
+                }
             }
         }
         pthread_mutex_unlock(&player_mutex);
@@ -162,12 +172,21 @@ int main() {
     bool playlist_window_needs_refresh = true;
     bool playlist_add_mode = true;
     int player_window_y_center = ((max_screen_size_y - 1) - (3*(max_screen_size_y/4))) / 2;
-    bool song_is_paused = false;
 
     // main loop
 
     while ((keypress = getch()) != 'q') {
         switch (keypress) {
+            case 32:
+                while (pthread_mutex_trylock(&player_mutex));
+                if (global_playing_song) {
+                    global_playing_song = false;
+                    global_epoch_when_song_was_paused = time_since_epoch();
+                } else {
+                    global_playing_song = true;
+                }
+                pthread_mutex_unlock(&player_mutex);
+                break;
             case KEY_RIGHT:
                 if (not playlist.empty()) {
                     playlist.erase(playlist.begin());
@@ -311,12 +330,16 @@ int main() {
                 song_progress = "##########";
             }
             wprintw(player_window, (formated_playback_time + " [" + song_progress + "] " + playlist[0].get_formated_duration()).data());
+            while (pthread_mutex_trylock(&player_mutex));
+            if (!global_playing_song) {
+                wmove(player_window, player_window_y_center + 1, ((2*(max_screen_size_x/3)) - 6) / 2);
+                wprintw(player_window, "Paused");
+            }
+            pthread_mutex_unlock(&player_mutex);
             wrefresh(player_window);
         }
     }
 
     endwin();
-    // TODO implement play feature
-    // TODO implement pause feature
     return 0;
 }
