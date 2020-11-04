@@ -162,11 +162,26 @@ int main() {
     bool playlist_window_needs_refresh = true;
     bool playlist_add_mode = true;
     int player_window_y_center = ((max_screen_size_y - 1) - (3*(max_screen_size_y/4))) / 2;
+    bool song_is_paused = false;
 
     // main loop
 
     while ((keypress = getch()) != 'q') {
         switch (keypress) {
+            case KEY_RIGHT:
+                if (not playlist.empty()) {
+                    playlist.erase(playlist.begin());
+                    playlist_window_needs_refresh = true;
+                    if (playlist.empty()) {
+                        while (pthread_mutex_trylock(&player_mutex));
+                        global_playing_song = false;
+                        pthread_mutex_unlock(&player_mutex);
+                    }
+                    while (pthread_mutex_trylock(&player_mutex));
+                    player_reset = true;
+                    pthread_mutex_unlock(&player_mutex);
+                }
+                break;
             case 97:
                 playlist_add_mode = true;
                 wmove(control_help_window, 0, 0);
@@ -303,6 +318,5 @@ int main() {
     endwin();
     // TODO implement play feature
     // TODO implement pause feature
-    // TODO implement skip song feature
     return 0;
 }
