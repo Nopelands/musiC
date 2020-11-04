@@ -3,10 +3,7 @@
 #include <ncurses.h>
 #include <string>
 #include <vector>
-#include <utility> // Not sure if everything here will still be necessary
-#include <unistd.h>
-#include <limits>
-#include <sstream>
+#include <utility>
 #include <chrono>
 
 using namespace std;
@@ -35,9 +32,6 @@ public:
     int get_duration() {
         return duration;
     }
-    int get_playback_time() {
-        return playback_time;
-    }
     string get_formated_duration() { // More of a formating function than a getter but anyway
         int minutes = duration / 60;
         int seconds = duration % 60;
@@ -55,10 +49,6 @@ public:
         }
         return formated_minutes + ":" + formated_seconds;
     }
-    // Here be setters
-    void set_playback_time(int seconds) { // será usado em versões futuras << haha yes lets goooooo
-        playback_time = seconds;
-    }
 };
 
 std::chrono::system_clock::rep time_since_epoch(){
@@ -71,8 +61,6 @@ std::chrono::system_clock::rep time_since_epoch(){
 }
 
 pthread_mutex_t player_mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t reset_mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t time_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 bool global_playing_song = false;
 bool player_reset = false;
@@ -133,7 +121,6 @@ int main() {
     curs_set(0);
     start_color();
     init_pair(1, COLOR_BLACK, COLOR_WHITE);
-//    cbreak();
     halfdelay(10);
     keypad(stdscr, true);
     int max_screen_size_y;
