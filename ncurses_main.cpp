@@ -201,11 +201,7 @@ int main() {
                 }
                 break;
             case 115: // s - alterna entre o modo sequencial e o modo aleatório
-                if (random_mode) {
-                    random_mode = false;
-                } else {
-                    random_mode = true;
-                }
+                random_mode = !random_mode;
                 break;
             case 97: // a - ativa o modo de adição de músicas
                 playlist_add_mode = true;
