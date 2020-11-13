@@ -5,6 +5,7 @@
 #include <vector>
 #include <utility>
 #include <chrono>
+#include <time.h>
 
 using namespace std;
 
@@ -107,6 +108,7 @@ vector<Song> fake_folder_init() { // inicializa o vector que representa um diret
 }
 
 int main() {
+    srand (time(NULL)); // seed para reprodução aleatória
     vector<Song> biblioteca; // representa um diretório com músicas
     biblioteca = fake_folder_init();
     vector<Song> playlist; // a playlist atual
@@ -163,6 +165,7 @@ int main() {
 
     bool playlist_window_needs_refresh = true;
     bool playlist_add_mode = true;
+    bool random_mode = false;
     int player_window_y_center = ((max_screen_size_y - 1) - (3*(max_screen_size_y/4))) / 2;
 
     // main loop
@@ -187,10 +190,21 @@ int main() {
                         while (pthread_mutex_trylock(&player_mutex));
                         global_playing_song = false;
                         pthread_mutex_unlock(&player_mutex);
+                    } else if (random_mode and playlist.size() != 1) { // se random_mode, escolhe uma música aleatória e a coloca na frente da playlist
+                        int next_song = rand() % (playlist.size()-1);
+                        playlist.insert(playlist.begin(), playlist[next_song]);
+                        playlist.erase(playlist.begin() + next_song + 1);
                     }
                     while (pthread_mutex_trylock(&player_mutex));
                     player_reset = true;
                     pthread_mutex_unlock(&player_mutex);
+                }
+                break;
+            case 115: // s - alterna entre o modo sequencial e o modo aleatório
+                if (random_mode) {
+                    random_mode = false;
+                } else {
+                    random_mode = true;
                 }
                 break;
             case 97: // a - ativa o modo de adição de músicas
@@ -206,7 +220,7 @@ int main() {
                 wrefresh(control_help_window);
                 break;
             case 49 ... 57: // 1-9 - adiciona ou remove a música de número especificado
-                keypress = keypress - 49;
+                keypress = keypress - 49; // transforma 1 em 0, 2 em 1 e assim por diante
                 if (playlist_add_mode) {
                     if (playlist.empty()) {
                         while (pthread_mutex_trylock(&player_mutex));
@@ -234,6 +248,11 @@ int main() {
                             while (pthread_mutex_trylock(&player_mutex));
                             player_reset = true;
                             pthread_mutex_unlock(&player_mutex);
+                        }
+                        if (not playlist.empty() and random_mode and playlist.size() != 1) { // se random_mode, escolhe uma música aleatória e a coloca na frente da playlist
+                            int next_song = rand() % (playlist.size()-1);
+                            playlist.insert(playlist.begin(), playlist[next_song]);
+                            playlist.erase(playlist.begin() + next_song + 1);
                         }
                     }
                 }
@@ -274,6 +293,11 @@ int main() {
                     global_playing_song = false;
                 } else {
                     player_reset = true;
+                }
+                if (not playlist.empty() and random_mode and playlist.size() != 1) { // se random_mode, escolhe uma música aleatória e a coloca na frente da playlist
+                    int next_song = rand() % (playlist.size()-1);
+                    playlist.insert(playlist.begin(), playlist[next_song]);
+                    playlist.erase(playlist.begin() + next_song + 1);
                 }
             }
             pthread_mutex_unlock(&player_mutex);
@@ -331,6 +355,12 @@ int main() {
                 wprintw(player_window, "Paused");
             }
             pthread_mutex_unlock(&player_mutex);
+            if (random_mode) {
+                wmove(player_window, player_window_y_center + 2, ((2*(max_screen_size_x/3)) - 19) / 2);
+                wprintw(player_window, "Random mode enabled");
+            }
+            wmove(player_window, player_window_y_center + 3, ((2*(max_screen_size_x/3)) - 22) / 2);
+            wprintw(player_window, "[s] toggle random mode");
             wrefresh(player_window);
         }
     }
